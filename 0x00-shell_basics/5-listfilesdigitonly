@@ -1,2 +1,4 @@
 #!/bin/bash
-ls -lha
+ls -l
+ls -h
+ls -a

@@ -1,2 +1,2 @@
 #!/bin/bash
-ls -alh --ignore=lost+found --color=always --group-directories-first $(pwd) .. /boot
+ls -la . ../ ../../../boot

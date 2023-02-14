@@ -1,2 +1,2 @@
 #!/bin/bash
-compgen -v -A function
+declare -p | grep -E '^declare (export )?-[aA]|^declare -f'

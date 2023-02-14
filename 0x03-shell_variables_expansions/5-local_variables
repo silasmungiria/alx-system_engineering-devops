@@ -1,2 +1,2 @@
 #!/bin/bash
-declare -p | cut -d' ' -f3 | sort -u
+declare -p

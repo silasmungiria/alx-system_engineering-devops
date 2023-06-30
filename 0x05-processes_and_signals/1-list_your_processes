@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# list_your_processes.sh
+# Description: Displays a list of currently running processes.
+#              Shows all processes, including those without a TTY,
+#              for all users.
+
+ps -auxf

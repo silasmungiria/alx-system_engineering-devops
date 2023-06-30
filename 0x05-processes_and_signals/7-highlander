@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# to_infinity_and_beyond.sh
+# Description: Displays "To infinity and beyond" indefinitely with a sleep of 2 seconds between each iteration.
+#              Also displays "I am invincible!!!" in between each iteration.
+
+while true
+do
+  echo "To infinity and beyond"
+  sleep 2
+  trap 'echo "I am invincible!!!"' SIGTERM
+done

@@ -1,4 +1,4 @@
-echo "# 0x05. Processes and Signals
+# 0x05. Processes and Signals
 
 This repository contains the solutions for the \"0x05. Processes and Signals\" project, which is part of the DevOps curriculum at ALX School. The project focuses on processes and signals in Linux and Bash scripting.
 

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Listens on port 98 on localhost for incoming connections.
+
+# Use the nc command to listen on port 98 on the localhost interface.
+# Incoming connections to port 98 will be accepted and handled by the script.
+
+nc -l localhost 98

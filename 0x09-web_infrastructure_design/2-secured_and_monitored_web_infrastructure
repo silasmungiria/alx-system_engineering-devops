@@ -1,0 +1,108 @@
+The secured and monitored three-server web infrastructure for www.foobar.com:
+
+```
+                  --------------------
+                 |  User's Computer  |
+                  --------------------
+                            |
+                            |
+                            V
+                  --------------------
+                 |    www.foobar.com     |    <---- Domain Name (www.foobar.com)
+                  --------------------
+                            |
+                            |
+           ---------------------------------
+          |              Nginx                |    <---- Nginx Web Server
+           ---------------------------------
+                            |
+                            |
+           ---------------------------------
+          |         Application Server         |    <---- Application Server
+           ---------------------------------
+                            |
+                            |
+           ---------------------------------
+          |           MySQL Database           |    <---- MySQL Database
+           ---------------------------------
+                            |
+                            |
+         --------------------------------
+        |         Firewall (1)            |    <---- Firewall 1
+         --------------------------------
+                            |
+                            |
+         --------------------------------
+        |         Firewall (2)            |    <---- Firewall 2
+         --------------------------------
+                            |
+                            |
+         --------------------------------
+        |         Firewall (3)            |    <---- Firewall 3
+         --------------------------------
+                            |
+                            |
+         --------------------------------
+        |   SSL Certificate (HTTPS)     |    <---- SSL Certificate for HTTPS
+         --------------------------------
+                            |
+                            |
+         --------------------------------
+        |  Monitoring Client (1)       |    <---- Monitoring Client 1 (Sumologic)
+         --------------------------------
+                            |
+                            |
+         --------------------------------
+        |  Monitoring Client (2)       |    <---- Monitoring Client 2 (Other Monitoring Service)
+         --------------------------------
+                            |
+                            |
+         --------------------------------
+        |  Monitoring Client (3)       |    <---- Monitoring Client 3 (Other Monitoring Service)
+         --------------------------------
+
+```
+
+Explanation of each component with real-world considerations:
+
+1. User's Computer: Represents the end-users accessing the website www.foobar.com. In a real-world scenario, this includes various devices and platforms, such as desktops, laptops, tablets, and smartphones.
+
+2. www.foobar.com (Domain Name): This is the website's domain name, which users will use to access the website. In the real world, this domain is registered through a domain registrar and points to the infrastructure's public IP address.
+
+3. Nginx Web Server: Acts as a reverse proxy and load balancer, receiving and forwarding incoming requests to the application server. In the real world, Nginx is configured with caching, compression, and other performance optimizations. It also handles SSL termination and forwards requests to the backend application server securely.
+
+4. Application Server: Responsible for processing dynamic content, executing the application logic, and generating dynamic responses for the users. In the real world, the application server runs the website's backend code, which may be written in languages such as Python, Ruby, Node.js, etc.
+
+5. MySQL Database: Stores the website's data, such as user information, blog posts, or any other dynamic content required by the application. In the real world, MySQL is optimized for read and write operations, and data is continuously backed up for disaster recovery.
+
+6. Firewalls (1, 2, and 3): Added for enhanced security, firewalls control incoming and outgoing network traffic and protect the web servers and database from unauthorized access and potential threats. In the real world, firewalls are configured to allow only necessary traffic and block any suspicious or malicious activity.
+
+7. SSL Certificate (HTTPS): Provides encrypted communication between the user's computer and the web server, ensuring secure data transmission and protecting sensitive information. In the real world, SSL certificates are obtained from trusted certificate authorities and are renewed periodically.
+
+8. Monitoring Clients (1, 2, and 3): Responsible for collecting performance and usage data from the web infrastructure and sending it to monitoring services such as Sumologic or other monitoring tools for analysis and alerting. In the real world, monitoring clients are configured to collect metrics such as CPU usage, memory usage, request response times, and database performance.
+
+Purpose of adding firewalls, serving traffic over HTTPS, and implementing monitoring:
+
+- Firewalls: Enhance security by controlling network traffic and preventing unauthorized access to the infrastructure. In the real world, firewalls are essential for protecting sensitive data and preventing cyberattacks.
+
+- HTTPS: Ensures secure communication between users and the web server, protecting data during transmission. In the real world, HTTPS is crucial for securing user login credentials, financial transactions, and other sensitive data.
+
+- Monitoring: Helps track the health, performance, and usage of the infrastructure, enabling proactive identification of potential issues and quick responses to incidents. In the real world, monitoring helps identify performance bottlenecks, server failures, and potential security breaches.
+
+Data collection process for the monitoring tool:
+
+Monitoring clients collect data from various components such as web servers, application servers, databases, and firewalls. This data is then sent to the monitoring service, where it is analyzed, aggregated, and presented through dashboards and reports for visualization and alerting. In the real world, monitoring tools like Sumologic, Prometheus, Grafana, or ELK (Elasticsearch, Logstash, Kibana) are commonly used to collect and analyze data.
+
+Guidelines on monitoring web server QPS:
+
+To monitor the web server's QPS (Queries Per Second), set up the monitoring client to collect data on the number of requests received by the web server per second. Analyze the data regularly to identify any spikes or abnormalities in traffic, which might indicate potential performance issues or security threats. In the real world, monitoring tools provide customizable alerts to notify administrators when certain thresholds are exceeded.
+
+Issues with this infrastructure:
+
+1. Terminating SSL at the Load Balancer Level: Terminating SSL at the load balancer means the encrypted data will be decrypted before reaching the application server. This can expose sensitive information within the internal network, reducing the overall security of the system. In the real world, SSL termination can be performed at the application server level to mitigate this issue.
+
+2. Single MySQL Server for Writes: Having only one MySQL server capable of accepting writes poses a single point of failure and can lead to data inconsistency in case of server failure. In the real world, implementing a MySQL cluster with multiple nodes for high availability and data redundancy can address this issue.
+
+3. Identical Server Components: The use of identical server components for all servers might lead to potential uniform failures if a critical vulnerability or misconfiguration affects one server. In the real world, diversifying server components, and implementing redundancy measures like using different hardware providers or cloud regions can reduce the risk of simultaneous failures.
+
+Note that this infrastructure would require additional configurations, security measures, backup solutions, and monitoring tools to ensure a robust and reliable web infrastructure. Redundancy and load balancing are essential for high availability and performance, while security measures are critical to protecting user data and preventing unauthorized access. Continuous monitoring and proactive management are necessary to ensure smooth operations and quick response to any issues or incidents.

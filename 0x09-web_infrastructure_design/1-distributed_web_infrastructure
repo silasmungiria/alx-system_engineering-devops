@@ -1,0 +1,102 @@
+Here is a distributed three-server web infrastructure for www.foobar.com with real-world considerations:
+
+```
+                 --------------------
+                |  User's Computer  |
+                 --------------------
+                           |
+                           |
+                           V
+                 --------------------
+                |   www.foobar.com     |    <---- Domain Name (www.foobar.com)
+                 --------------------
+                           |
+                           |
+           ---------------------------------
+          |            HAproxy              |    <---- HAproxy Load Balancer
+           ---------------------------------
+                           |
+                  ----------------------------
+                 |          Server 1            |    <---- Server 1
+                  ----------------------------
+                           |
+                           |
+           ---------------------------------
+          |              Nginx                |    <---- Nginx Web Server
+           ---------------------------------
+                           |
+                           |
+           ---------------------------------
+          |         Application Server         |    <---- Application Server
+           ---------------------------------
+                           |
+                           |
+         --------------------------------
+        |          MySQL Primary           |    <---- MySQL Primary Database
+         --------------------------------
+                           |
+                           |
+         --------------------------------
+        |           MySQL Replica           |    <---- MySQL Replica Database
+         --------------------------------
+                           |
+                           |
+                  ----------------------------
+                 |          Server 2            |    <---- Server 2
+                  ----------------------------
+
+```
+
+Explanation of each component with real-world considerations:
+
+1. User's Computer: Represents the end-users accessing the website www.foobar.com. In a real-world scenario, this includes various devices and platforms, such as desktops, laptops, tablets, and smartphones.
+
+2. www.foobar.com (Domain Name): This is the website's domain name, which users will use to access the website. In the real world, this domain is registered through a domain registrar and points to the infrastructure's public IP address.
+
+3. HAproxy Load Balancer: Acts as a reverse proxy and load balancer to distribute incoming requests across multiple backend servers. In the real world, HAproxy is configured to handle SSL termination, handle SSL certificates, and efficiently distribute the traffic based on various load-balancing algorithms.
+
+4. Server 1 and Server 2: Represents the two servers in the infrastructure, providing redundancy, load balancing capabilities, and fault tolerance. In a real-world scenario, these servers are cloud instances or physical servers located in data centers.
+
+5. Nginx Web Server: Acts as a reverse proxy, load balancer, and SSL terminator, receiving and forwarding incoming requests to the application server. In the real world, Nginx is configured with caching, compression, and other performance optimizations.
+
+6. Application Server: Responsible for processing dynamic content, executing the application logic, and generating dynamic responses for the users. In the real world, the application server runs the website's backend code, which may be written in languages such as Python, Ruby, Node.js, etc.
+
+7. MySQL Primary Database: Serves as the primary read-write database for the application. In the real world, the primary database is optimized for read and write operations, and data is continuously replicated to the replicas.
+
+8. MySQL Replica Database: Acts as a read-only replica of the primary database, providing data redundancy and backup. In the real world, the replicas are asynchronous and handle read traffic to offload the primary database.
+
+Justification for the addition of each new element:
+
+- HAproxy Load Balancer: Added to distribute incoming traffic evenly across the two servers, ensuring better performance and high availability. In the real world, HAproxy provides failover support and ensures seamless handling of incoming requests even if one server goes down.
+
+Explanation of the distribution algorithm used by the load balancer:
+
+The HAproxy load balancer uses a round-robin distribution algorithm. It routes incoming requests sequentially to each server in a cyclical manner, ensuring an even distribution of the load among all available servers. In the real world, other load-balancing algorithms like Least Connections, IP Hash, or Weighted Round Robin may be used based on specific requirements.
+
+Differentiation between Active-Active and Active-Passive setups for the load balancer:
+
+- Active-Active Setup: In this setup, all load balancers are actively serving traffic simultaneously, distributing the load among all servers. In the real world, an active-active setup can be achieved using a dedicated hardware load balancer or software-based load balancer running on multiple nodes.
+
+- Active-Passive Setup: In this setup, only one load balancer is active and serving traffic at a time, while the others remain in a standby mode. The standby load balancers take over if the active one fails, providing failover support. In the real world, this setup may involve using high-availability (HA) configurations or heartbeat mechanisms to monitor the active load balancer's status.
+
+Description of how a Primary-Replica (Master-Slave) cluster works for the database and its implications on the application:
+
+In the Primary-Replica (Master-Slave) cluster, the primary database handles read and write operations, while the replica databases act as read-only copies for data redundancy. The primary database replicates data changes to the replicas in real-time. In the real world, this replication process is asynchronous to reduce the impact on the primary database's performance.
+
+Implications on the application:
+
+- Improved Read Performance: Read traffic can be distributed across the replicas, reducing the load on the primary database and improving overall read performance. In the real world, this ensures better user experience and faster response times for read-heavy applications.
+
+- Data Redundancy: In case of primary database failure, the application can switch to using the replica as a failover, ensuring data availability. In the real world, this provides data resilience and minimizes downtime in case of database issues.
+
+- Enhanced Data Protection: Replication provides data backups, protecting against data loss in case of database failure. In the real world, this contributes to data durability and disaster recovery.
+
+Issues with this infrastructure and real-world considerations:
+
+1. Single Point of Failure (SPOF): The HAproxy load balancer can become a single point of failure. If it fails, the entire infrastructure may become inaccessible. In the real world, this issue can be mitigated by employing redundancy, active-active setups, or cloud-based load balancer solutions.
+
+2. Security Concerns: The infrastructure lacks additional security measures such as firewalls, which may expose the servers and database to potential threats. In the real world, implementing firewalls and security policies is crucial to safeguard the infrastructure from malicious activities.
+
+3. Lack of Monitoring: Monitoring tools are not included, which makes it challenging to identify and address potential performance issues or security breaches. In the real world, monitoring tools like Prometheus, Grafana, or other third-party solutions are essential for proactive issue identification and performance optimization.
+
+In a real-world scenario, this distributed web infrastructure would be hosted on reliable cloud platforms like AWS, Azure, or Google Cloud, providing scalability, automated backup, and redundancy. Additionally, other security measures such as encryption of data at rest and in transit, proper access controls, and regular system updates are crucial to ensure a robust and secure web environment. Continuous monitoring and regular performance optimizations are also vital for providing the best user experience and maintaining a highly available web infrastructure.

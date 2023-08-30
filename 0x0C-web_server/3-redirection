@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# This script automates the installation, configuration, and starting of a web server using Nginx.
+
+# Update package information
+apt-get update
+
+# Install Nginx
+apt-get -y install nginx
+
+# Allow incoming HTTP traffic through the firewall
+sudo ufw allow 'Nginx HTTP'
+
+# Create directory for web content
+mkdir -p /var/www/html/
+
+# Set permissions for web content directory
+sudo chmod -R 755 /var/www
+
+# Create a basic index.html page
+echo 'Hello World!' > /var/www/html/index.html
+
+# Define the Nginx server configuration
+SERVER_CONFIG=\
+"server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+    server_name _;
+    location / {
+        try_files \$uri \$uri/ =404;
+    }
+    if (\$request_filename ~ redirect_me) {
+        rewrite ^ https://sketchfab.com/bluepeno/models permanent;
+    }
+}"
+
+# Apply the custom server configuration
+bash -c "echo -e '$SERVER_CONFIG' > /etc/nginx/sites-enabled/default"
+
+# Check if Nginx is running and start/restart accordingly
+if [ "$(pgrep -c nginx)" -le 0 ]; then
+    service nginx start
+else
+    service nginx restart
+fi

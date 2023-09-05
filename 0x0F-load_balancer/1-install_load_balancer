@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Installs and setup haproxy
+
+# Install software-properties-common to manage software repositories
+apt-get install -y software-properties-common
+
+# Add the HAProxy PPA repository for version 1.8
+add-apt-repository -y ppa:vbernat/haproxy-1.8
+
+# Update package repository
+apt-get -y update
+
+# Install HAProxy version 1.8
+apt-get install -y haproxy=1.8.\*
+
+# Enable HAProxy by creating a configuration file
+echo "ENABLED=1" > /etc/default/haproxy
+
+# Configure HAProxy by appending the following block to haproxy.cfg
+# This defines a load balancer listening on port 80 and balancing requests,
+# between two backend servers
+echo "
+   listen load_balancer
+   bind *:80
+   mode http
+   balance roundrobin
+   option httpclose
+   option forwardfor
+   server 17272-web-01 44.200.83.158:80 check
+   server 17272-web-02 3.237.16.226:80 check
+" >> /etc/haproxy/haproxy.cfg
+
+# Start the HAProxy service
+service haproxy start

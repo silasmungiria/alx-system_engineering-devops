@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# Update package repository
+apt-get -y update
+
+# Install Nginx
+apt-get -y install nginx
+
+# Create a default HTML file
+echo "Hello World!" > /var/www/html/index.nginx-debian.html
+
+# Create a custom 404 HTML file
+echo "Ceci n'est pas une page" > /usr/share/nginx/html/custom_404.html
+
+# Configure Nginx
+nginx_config_file="/etc/nginx/sites-available/default"
+nginx_main_config="/etc/nginx/nginx.conf"
+
+# Add a rewrite rule for redirection and configure a custom 404 error page
+sed -i "s/server_name _;/server_name _;\n\trewrite ^\/redirect_me https:\/\/github.com\/Tolulope05 permanent;\n\n\terror_page 404 \/custom_404.html;\n\tlocation = \/custom_404.html {\n\t\troot \/usr\/share\/nginx\/html;\n\t\tinternal;\n\t}/" "$nginx_config_file"
+
+# Add a custom header to Nginx responses
+sed -i "s/include \/etc\/nginx\/sites-enabled\/\*;/include \/etc\/nginx\/sites-enabled\/\*;\n\tadd_header X-Served-By \"$HOSTNAME\";/" "$nginx_main_config"
+
+# Start Nginx service
+service nginx start

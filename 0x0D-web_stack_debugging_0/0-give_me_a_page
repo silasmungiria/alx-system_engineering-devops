@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
-# run apache on designated container
+# Fix Apache in Docker container to return "Hello Holberton"
 
-echo "ServerName localhost" >> /etc/apache2.conf
+# Step 2
+docker exec -it <container_id> /bin/bash
+
+# Step 3
+apt-get update
+apt-get install apache2 -y
+
+# Step 4
+echo "Hello Holberton" > /var/www/html/index.html
+
+# Step 5
+service apache2 status
 service apache2 start
+

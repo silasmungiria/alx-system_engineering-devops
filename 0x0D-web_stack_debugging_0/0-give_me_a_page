@@ -12,7 +12,7 @@ apt-get install apache2 -y
 echo "Hello Holberton" > /var/www/html/index.html
 
 # Step 5
-if service apache2 status | grep -q "apache2 is running"; then
+if wget -qO- http://localhost | grep -q "Hello Holberton"; then
     echo "Apache is running"
 else
     service apache2 start

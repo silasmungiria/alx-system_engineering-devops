@@ -1,3 +1,22 @@
 #!/usr/bin/env bash
-# script to initialize server apache
-/etc/init.d/apache2 start
+# Fix Apache in Docker container to return "Hello Holberton"
+
+# Step 2
+docker exec -it <container_id> /bin/bash
+
+# Step 3
+apt-get update
+apt-get install apache2 -y
+
+# Step 4
+echo "Hello Holberton" > /var/www/html/index.html
+
+# Step 5
+if wget -qO- http://localhost | grep -q "Hello Holberton"; then
+    echo "Apache is running"
+else
+    service apache2 start
+fi
+
+#Step 6
+exit

@@ -1,9 +1,33 @@
-#!/usr/bin/env bash
-# Script that configures Nginx server with a custom header
-apt-get -y update
-apt-get -y install nginx
-echo "Hello World!" > /var/www/html/index.nginx-debian.html
-echo "Ceci n'est pas une page" > /usr/share/nginx/html/custom_404.html
-sed -i "s/server_name _;/server_name _;\n\trewrite ^\/redirect_me https:\/\/github.com\/mugambi permanent;\n\n\terror_page 404 \/custom_404.html;\n\tlocation = \/custom_404.html {\n\t\troot \/usr\/share\/nginx\/html;\n\t\tinternal;\n\t}/" /etc/nginx/sites-available/default
-sed -i "s/include \/etc\/nginx\/sites-enabled\/\*;/include \/etc\/nginx\/sites-enabled\/\*;\n\tadd_header X-Served-By \"$HOSTNAME\";/" /etc/nginx/nginx.conf
-service nginx start
+# 2-puppet_custom_http_response_header.pp
+
+# Update package list and install Nginx
+package { 'nginx':
+  ensure => 'installed',
+}
+
+# Create default page
+file { '/var/www/html/index.nginx-debian.html':
+  content => 'Hello World!',
+}
+
+# Create custom 404 page
+file { '/usr/share/nginx/html/custom_404.html':
+  content => "Ceci n'est pas une page",
+}
+
+# Configure Nginx
+file { '/etc/nginx/sites-available/default':
+  content => template('nginx/default.erb'),
+}
+
+# Add custom header to Nginx
+file { '/etc/nginx/conf.d/custom_headers.conf':
+  content => "add_header X-Served-By 91903-web-$::hostname;",
+}
+
+# Start Nginx
+service { 'nginx':
+  ensure  => 'running',
+  enable  => true,
+  require => [Package['nginx'], File['/var/www/html/index.nginx-debian.html'], File['/usr/share/nginx/html/custom_404.html'], File['/etc/nginx/sites-available/default'], File['/etc/nginx/conf.d/custom_headers.conf']],
+}

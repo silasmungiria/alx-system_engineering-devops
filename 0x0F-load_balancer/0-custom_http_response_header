@@ -21,7 +21,8 @@ if [[ $(hostname) == *-web-01 || $(hostname) == *-web-02 ]]; then
 
     # Add to the nginx configuration file a redirection to another page
     FIND=$(grep "redirect_me" /etc/nginx/sites-available/default)
-    STRING="\\\n\tlocation /redirect_me {\n\t\t return 301 https://www.youtube.com/watch?v=3MbaGJN2ioQ;\n\t}\n"
+    STRING="\\\n\tlocation /redirect_me {
+      \n\t\t return 301 https://www.youtube.com/watch?v=3MbaGJN2ioQ;\n\t}\n"
     if [[ -z $FIND ]]; then
         sed -i "42i $STRING" /etc/nginx/sites-available/default
     fi

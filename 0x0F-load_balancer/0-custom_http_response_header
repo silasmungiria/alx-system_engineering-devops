@@ -1,39 +1,32 @@
 #!/usr/bin/env bash
-# Configuration script for web-01 and web-02 servers
+# Script to configure Nginx server with a custom header
 
-# Install nginx
+# Update package list
 apt-get -y update
+
+# Install Nginx
 apt-get -y install nginx
 
-# Add custom response header to know the server name for debugging
-HOST_NAME=$(hostname)
-HEADER="\\\n\tadd_header X-Served-By $HOST_NAME;\n"
+# Create default page
+echo "Hello World!" > /var/www/html/index.nginx-debian.html
 
-# Configure both web servers
-if [[ $(hostname) == *-web-01 || $(hostname) == *-web-02 ]]; then
-    FIND=$(grep "X-Server-by" /etc/nginx/sites-available/default)
-    if [[ -z $FIND ]]; then
-        sed -i "23i $HEADER" /etc/nginx/sites-available/default
-    fi
+# Create custom 404 page
+echo "Ceci n'est pas une page" > /usr/share/nginx/html/custom_404.html
 
-    # Create a first index.html page
-    echo "Hello World!" > /var/www/html/index.html
+# Configure Nginx
+sed -i "s/server_name _;/\
+    server_name _;\n\
+    rewrite ^\/redirect_me https:\/\/github.com\/Tolulope05 permanent;\n\
+    error_page 404 \/custom_404.html;\n\
+    location = \/custom_404.html {\n\
+        root \/usr\/share\/nginx\/html;\n\
+        internal;\n\
+    }/" /etc/nginx/sites-available/default
 
-    # Add to the nginx configuration file a redirection to another page
-    FIND=$(grep "redirect_me" /etc/nginx/sites-available/default)
-    STRING="\\\n\tlocation /redirect_me {
-      \n\t\t return 301 https://www.youtube.com/watch?v=3MbaGJN2ioQ;\n\t}\n"
-    if [[ -z $FIND ]]; then
-        sed -i "42i $STRING" /etc/nginx/sites-available/default
-    fi
+# Add custom header
+sed -i "s/include \/etc\/nginx\/sites-enabled\/\*;/\
+    include \/etc\/nginx\/sites-enabled\/\*;\n\
+    add_header X-Served-By \"$HOSTNAME\";/" /etc/nginx/nginx.conf
 
-    # Add to the nginx configuration file an error page 404
-    FIND=$(grep "error_page 404" /etc/nginx/sites-available/default)
-    ERROR="\\\n\terror_page 404 /custom_404.html;\n"
-    if [[ -z $FIND ]]; then
-        echo "Ceci n'est pas une page" > /var/www/html/custom_404.html
-        sed -i "40i $ERROR" /etc/nginx/sites-available/default
-    fi
-
-    service nginx restart
-fi
+# Start Nginx
+service nginx start

@@ -1,34 +1,9 @@
-#!/usr/bin/puppet apply
-
-package {'nginx':
-  ensure => 'installed',
-}
-
-file {'/var/www/html/index.nginx-debian.html':
-  content => 'Hello World!',
-}
-
-file {'/usr/share/nginx/html/custom_404.html':
-  content => "Ceci n'est pas une page",
-}
-
-file {'/etc/nginx/sites-available/default':
-  content => template('nginx/default.erb'),
-}
-
-file {'/etc/nginx/nginx.conf':
-  content => template('nginx/nginx.conf.erb'),
-}
-
-service {'nginx':
-  ensure  => 'running',
-  enable  => true,
-  require => [Package['nginx'], File['/var/www/html/index.nginx-debian.html'], File['/usr/share/nginx/html/custom_404.html'], File['/etc/nginx/sites-available/default'], File['/etc/nginx/nginx.conf']],
-}
-
-Facter.add('custom_served_by_header') do
-  setcode do
-    Facter::Core::Execution.execute('hostname')
-  end
-end
-
+#!/usr/bin/env bash
+# Script that configures Nginx server with a custom header
+apt-get -y update
+apt-get -y install nginx
+echo "Hello World!" > /var/www/html/index.nginx-debian.html
+echo "Ceci n'est pas une page" > /usr/share/nginx/html/custom_404.html
+sed -i "s/server_name _;/server_name _;\n\trewrite ^\/redirect_me https:\/\/github.com\/mugambi permanent;\n\n\terror_page 404 \/custom_404.html;\n\tlocation = \/custom_404.html {\n\t\troot \/usr\/share\/nginx\/html;\n\t\tinternal;\n\t}/" /etc/nginx/sites-available/default
+sed -i "s/include \/etc\/nginx\/sites-enabled\/\*;/include \/etc\/nginx\/sites-enabled\/\*;\n\tadd_header X-Served-By \"$HOSTNAME\";/" /etc/nginx/nginx.conf
+service nginx start

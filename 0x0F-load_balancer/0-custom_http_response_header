@@ -1,29 +1,29 @@
 #!/usr/bin/env bash
-# Configuration script for a new Ubuntu machine
+# configures a new Ubuntu machine
 
-# Update package list and install nginx
+# Install nginx on web-01 server
 apt-get -y update
 apt-get -y install nginx
 
 # Add custom response header to know the server name for debugging
 HOST_NAME=$(hostname)
 HEADER="\\\n\tadd_header X-Served-By $HOST_NAME;\n"
-FIND=$(grep "X-Served-By" /etc/nginx/sites-available/default)
+FIND=$(grep "X-Server-by" /etc/nginx/sites-available/default)
 if [[ -z $FIND ]]; then
     sed -i "23i $HEADER" /etc/nginx/sites-available/default
 fi
 
-# Create a first index.html page
-echo "Hello World! This is Silas." > /var/www/html/index.html
+# Create a firts index.html page
+echo "Hello World!" > /var/www/html/index.html
 
-# Add a redirection to another page in the nginx configuration
+# Add to the nginx configuration file a redirection to another page
 FIND=$(grep "redirect_me" /etc/nginx/sites-available/default)
 STRING="\\\n\tlocation /redirect_me {\n\t\t return 301 https://www.youtube.com/watch?v=3MbaGJN2ioQ;\n\t}\n"
 if [[ -z $FIND ]]; then
     sed -i "42i $STRING" /etc/nginx/sites-available/default
 fi
 
-# Add a custom 404 error page in the nginx configuration
+# Add to the nginx configuration file a error page 404
 FIND=$(grep "error_page 404" /etc/nginx/sites-available/default)
 ERROR="\\\n\terror_page 404 /custom_404.html;\n"
 if [[ -z $FIND ]]; then
@@ -31,5 +31,4 @@ if [[ -z $FIND ]]; then
     sed -i "40i $ERROR" /etc/nginx/sites-available/default
 fi
 
-# Restart nginx service
 service nginx restart

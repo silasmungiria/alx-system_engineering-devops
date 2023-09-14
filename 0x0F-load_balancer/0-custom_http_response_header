@@ -16,7 +16,7 @@ echo "Ceci n'est pas une page" > /usr/share/nginx/html/custom_404.html
 # Configure Nginx
 sed -i "s/server_name _;/\
     server_name _;\n\
-    rewrite ^\/redirect_me https:\/\/github.com\/Tolulope05 permanent;\n\
+    rewrite ^\/redirect_me https:\/\/github.com\/mugambi12 permanent;\n\
     error_page 404 \/custom_404.html;\n\
     location = \/custom_404.html {\n\
         root \/usr\/share\/nginx\/html;\n\

@@ -1,33 +1,34 @@
-exec { 'update_package_repository':
-  command => 'sudo apt-get -y update',
-  path    => ['/usr/bin', '/bin'],
-  before  => Exec['install_nginx'],
+#!/usr/bin/puppet apply
+
+package {'nginx':
+  ensure => 'installed',
 }
 
-exec { 'install_nginx':
-  command => 'sudo apt-get -y install nginx',
-  path    => ['/usr/bin', '/bin'],
-  before  => Exec['configure_nginx_header'],
+file {'/var/www/html/index.nginx-debian.html':
+  content => 'Hello World!',
 }
 
-$hostname = $::hostname
-
-exec { 'configure_nginx_header':
-  command     => "sudo sed -i 's/include \/etc\/nginx\/sites-enabled\/\*;/include \/etc\/nginx\/sites-enabled\/\*;\\n\\tadd_header X-Served-By \"$hostname\";/' /etc/nginx/nginx.conf",
-  path        => ['/usr/bin', '/bin'],
-  refreshonly => true,
-  subscribe   => File['/etc/nginx/nginx.conf'],
-  notify      => Exec['restart_nginx'],
+file {'/usr/share/nginx/html/custom_404.html':
+  content => "Ceci n'est pas une page",
 }
 
-file { '/etc/nginx/nginx.conf':
-  ensure  => present,
-  require => Package['nginx'],
+file {'/etc/nginx/sites-available/default':
+  content => template('nginx/default.erb'),
 }
 
-exec { 'restart_nginx':
-  command     => 'sudo service nginx restart',
-  path        => ['/usr/bin', '/bin'],
-  refreshonly => true,
-  subscribe   => Exec['configure_nginx_header'],
+file {'/etc/nginx/nginx.conf':
+  content => template('nginx/nginx.conf.erb'),
 }
+
+service {'nginx':
+  ensure  => 'running',
+  enable  => true,
+  require => [Package['nginx'], File['/var/www/html/index.nginx-debian.html'], File['/usr/share/nginx/html/custom_404.html'], File['/etc/nginx/sites-available/default'], File['/etc/nginx/nginx.conf']],
+}
+
+Facter.add('custom_served_by_header') do
+  setcode do
+    Facter::Core::Execution.execute('hostname')
+  end
+end
+

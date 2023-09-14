@@ -6,16 +6,16 @@ sudo apt-get update
 sudo apt-get install -y haproxy
 
 # Configure HAProxy
-sudo bash -c 'echo "frontend sm12se.tech
-    bind 0:80
-    mode http
-    default_backend web_servers
+echo '
+frontend sm12se.tech
+	bind 0:80
+	default_backend web_servers
 
 backend web_servers
-    mode http
-    balance roundrobin
-    server 91903-web-01 54.197.105.254:80 check
-    server 91903-web-02 100.24.206.145:80 check" > /etc/haproxy/haproxy.cfg'
+	balance roundrobin
+	server 91903-web-01 54.197.105.254:80 check
+	server 91903-web-02 100.24.206.145:80 check
+' >> /etc/haproxy/haproxy.cfg
 
 # Enable HAProxy via defaults file
 sudo sed -i '/CONFIG=/c\CONFIG="/etc/haproxy/haproxy.cfg"' /etc/default/haproxy

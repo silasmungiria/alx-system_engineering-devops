@@ -1,34 +1,19 @@
 #!/usr/bin/env bash
-# Installs and setup haproxy
+# Configuration script for lb-01 server
 
-# Install software-properties-common to manage software repositories
-apt-get install -y software-properties-common
+# Update package list and install HAProxy
+sudo apt-get -y update
+sudo apt-get -y install haproxy
 
-# Add the HAProxy PPA repository for version 1.8
-add-apt-repository -y ppa:vbernat/haproxy-1.8
+# Configure HAProxy to send traffic to web-01 and web-02 using roundrobin algorithm
+sudo sh -c 'echo '\''frontend sm12se.tech
+    bind 0:80
+    default_backend web_servers
 
-# Update package repository
-apt-get -y update
+backend web_servers
+    balance roundrobin
+    server 91903-web-01 54.197.105.254:80 check
+    server 91903-web-02 100.24.206.145:80 check'\'' >> /etc/haproxy/haproxy.cfg'
 
-# Install HAProxy version 1.8
-apt-get install -y haproxy=1.8.\*
-
-# Enable HAProxy by creating a configuration file
-echo "ENABLED=1" > /etc/default/haproxy
-
-# Configure HAProxy by appending the following block to haproxy.cfg
-# This defines a load balancer listening on port 80 and balancing requests,
-# between two backend servers
-echo "
-   listen load_balancer
-   bind *:80
-   mode http
-   balance roundrobin
-   option httpclose
-   option forwardfor
-   server 17272-web-01 44.200.83.158:80 check
-   server 17272-web-02 3.237.16.226:80 check
-" >> /etc/haproxy/haproxy.cfg
-
-# Start the HAProxy service
-service haproxy start
+# Restart HAProxy service
+sudo service haproxy restart

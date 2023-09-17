@@ -1,32 +1,61 @@
 #!/usr/bin/env bash
-# Script to configure Nginx server with a custom header
+# Script to automate Nginx server configuration
 
-# Update package list
-apt-get -y update
+# Function to update package list and install Nginx
+install_nginx() {
+    apt-get -y update
+    apt-get -y install nginx
+}
 
-# Install Nginx
-apt-get -y install nginx
+# Function to create default and custom 404 pages
+create_pages() {
+    echo "Hello World!" > /var/www/html/index.nginx-debian.html
+    echo "Ceci n'est pas une page" > /var/www/html/custom_404.html
+}
 
-# Create default page
-echo "Hello World!" > /var/www/html/index.nginx-debian.html
+# Function to configure Nginx
+configure_nginx() {
+    cat <<EOF > /etc/nginx/sites-available/default
+# Updated configuration
 
-# Create custom 404 page
-echo "Ceci n'est pas une page" > /var/www/html/custom_404.html
+server {
+    listen 80 default_server;
 
-# Configure Nginx
-sed -i "s/server_name _;/\
-    server_name _;\n\
-    rewrite ^\/redirect_me https:\/\/github.com\/mugambi12 permanent;\n\
-    error_page 404 \/custom_404.html;\n\
-    location = \/custom_404.html {\n\
-        root \/var\/www\/html\/;\n\
-        internal;\n\
-    }/" /etc/nginx/sites-available/default
+    add_header X-Served-By 91903-web-01;
 
-# Add custom header
-sed -i "s/include \/etc\/nginx\/sites-enabled\/\*;/\
-    include \/etc\/nginx\/sites-enabled\/\*;\n\
-    add_header X-Served-By \"$HOSTNAME\";/" /etc/nginx/nginx.conf
+    listen [::]:80 default_server;
 
-# Start Nginx
-service nginx start
+    error_page 404 /custom_404.html;
+
+    location /redirect_me {
+             return 301 https://github.com/Mugambi12;
+    }
+
+    root /var/www/html;
+
+    index index.html index.htm index.nginx-debian.html;
+
+    server_name _;
+
+    location / {
+            try_files $uri $uri/ =404;
+    }
+}
+EOF
+
+    cat <<EOF >> /etc/nginx/nginx.conf
+    include /etc/nginx/sites-enabled/*;
+}
+EOF
+}
+
+# Function to start Nginx
+start_nginx() {
+    service nginx start
+}
+
+# Main execution
+install_nginx
+create_pages
+configure_nginx
+start_nginx

@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 # Fix Apache in Docker container to return "Hello Holberton"
 
@@ -11,15 +10,6 @@ apt-get install apache2 -y
 
 # Step 4
 echo "Hello Holberton" > /var/www/html/index.html
-
-# Add Nginx configuration
-echo '
-server {
-    ...
-    root /var/www/html;
-    ...
-}
-' >> /etc/nginx/sites-enabled/default
 
 # Step 5
 if wget -qO- http://localhost | grep -q "Hello Holberton"; then

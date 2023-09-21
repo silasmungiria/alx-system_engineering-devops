@@ -17,9 +17,5 @@ backend web_servers
 	server 91903-web-02 100.24.206.145:80 check
 ' >> /etc/haproxy/haproxy.cfg
 
-# Enable HAProxy via defaults file
-sudo sed -i '/CONFIG=/c\CONFIG="/etc/haproxy/haproxy.cfg"' /etc/default/haproxy
-sudo sed -i '/EXTRAOPTS=/c\EXTRAOPTS="-de -m 16"' /etc/default/haproxy
-
 # Restart HAProxy
 sudo service haproxy restart

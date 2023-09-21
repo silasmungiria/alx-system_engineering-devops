@@ -5,6 +5,14 @@
 apt-get -y update
 apt-get -y install haproxy
 
+echo "
+# Change the config file location if needed
+CONFIG="/etc/haproxy/haproxy.cfg"
+
+# Add extra flags here, see haproxy(1) for a few options
+EXTRAOPTS="-de -m 16"
+" >> /etc/default/haproxy
+
 # Configure haproxy configuration file to distribute requests using a roundrobin algorithm
 echo '
 frontend sm12se.tech

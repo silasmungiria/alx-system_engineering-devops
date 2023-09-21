@@ -1,23 +1,31 @@
 #!/usr/bin/env bash
-# Script that configures Nginx server with a custom header
+# Installs nginx on my server
+apt-get update
+apt-get install -y nginx
 
-# Update package list and install nginx
-apt-get -y update
-apt-get -y install nginx
+mkdir -p /var/www/test/html
+touch /var/www/test/html/index.html
+echo "Hello World!" > /var/www/test/html/index.html
+touch /var/www/test/html/404.html
+echo "Ceci n'est pas une page" > /var/www/test/html/404.html
+printf %s "server {
+     listen      80;
+     listen      [::]:80;
+     add_header  X-Served-By $HOSTNAME;
+     root        /var/www/test/html;
+     index       index.html index.htm;
 
-# Create default HTML files
-echo "Hello World!" > /var/www/html/index.nginx-debian.html
-echo "Ceci n'est pas une page" > /usr/share/nginx/html/custom_404.html
 
-# Configure Nginx
-sed -i "
-    s|server_name _;|server_name _;\n\trewrite ^\/redirect_me http://cuberule.com/ permanent;\n\n\terror_page 404 \/custom_404.html;\n\tlocation = \/custom_404.html {\n\t\troot \/usr\/share\/nginx\/html;\n\t\tinternal;\n\t}|
-" /etc/nginx/sites-available/default
+     location /redirect_me {
+        return 301 'https://www.youtube.com/watch?v=QH2-TGUlwu4';
+    }
 
-# Add custom header
-sed -i "
-    s|include \/etc\/nginx\/sites-enabled\/\*;|include \/etc\/nginx\/sites-enabled\/\*;\n\tadd_header X-Served-By \"$HOSTNAME\";|
-" /etc/nginx/nginx.conf
+    error_page 404 /404.html;
+    location /404 {
+      root /var/www/test/html;
+      internal;
+}
+}
+" > /etc/nginx/sites-available/default
 
-# Start Nginx service
-service nginx start
+service nginx restart

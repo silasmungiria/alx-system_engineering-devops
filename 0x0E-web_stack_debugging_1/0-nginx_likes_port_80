@@ -17,6 +17,13 @@ else
     echo "Nginx is already running."
 fi
 
+# Ensure Nginx configuration is enabled
+if ! [ -e /etc/nginx/sites-enabled/default ]
+then
+    echo "Enabling Nginx configuration..."
+    sudo ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+fi
+
 # Check if Nginx is listening on port 80
 if ! ss -tln | grep -q ':80'
 then

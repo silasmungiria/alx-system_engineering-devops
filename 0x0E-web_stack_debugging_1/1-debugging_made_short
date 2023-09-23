@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
-ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+# This script attempts to fix Nginx not listening on port 80
+[ -e /etc/nginx/sites-enabled/default ] || ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 service nginx restart
 kill "$(pgrep 'nginx' | head -1)"

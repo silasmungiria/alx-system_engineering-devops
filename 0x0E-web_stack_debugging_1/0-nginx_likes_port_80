@@ -1,5 +1,29 @@
 #!/usr/bin/env bash
-# script that restores the default server port
+# This script attempts to fix Nginx not listening on port 80
 
-sudo ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
-sudo service nginx restart
+# Check if Nginx is installed
+if ! command -v nginx &> /dev/null
+then
+    echo "Nginx is not installed. Please install it first."
+    exit 1
+fi
+
+# Check if Nginx is running
+if ! systemctl is-active --quiet nginx
+then
+    echo "Nginx is not running. Starting Nginx..."
+    sudo systemctl start nginx
+else
+    echo "Nginx is already running."
+fi
+
+# Check if Nginx is listening on port 80
+if ! ss -tln | grep -q ':80'
+then
+    echo "Configuring Nginx to listen on port 80..."
+    sudo sed -i 's/\(listen \[::\]:\)\(80\)/\180/' /etc/nginx/sites-available/default
+    sudo systemctl restart nginx
+    echo "Nginx is now listening on port 80."
+else
+    echo "Nginx is already listening on port 80."
+fi

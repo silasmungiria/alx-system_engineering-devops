@@ -9,10 +9,10 @@ then
 fi
 
 # Check if Nginx is running
-if ! systemctl is-active --quiet nginx
+if ! service nginx status &> /dev/null
 then
     echo "Nginx is not running. Starting Nginx..."
-    sudo systemctl start nginx
+    sudo service nginx start
 else
     echo "Nginx is already running."
 fi
@@ -22,7 +22,7 @@ if ! ss -tln | grep -q ':80'
 then
     echo "Configuring Nginx to listen on port 80..."
     sudo sed -i 's/\(listen \[::\]:\)\(80\)/\180/' /etc/nginx/sites-available/default
-    sudo systemctl restart nginx
+    sudo service nginx restart
     echo "Nginx is now listening on port 80."
 else
     echo "Nginx is already listening on port 80."

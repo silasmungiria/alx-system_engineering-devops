@@ -1,21 +1,30 @@
 #!/usr/bin/env bash
-# configures a new HAproxy as a load balancer
+# This script configures HAproxy as a load balancer
 
-# Install HAproxy on a server
-apt-get -y update
-apt-get -y install haproxy=1.6.\*
+# Check if HAproxy is already installed
+if ! dpkg -l | grep -q haproxy; then
+    # Install HAproxy
+    apt-get -y update || { echo "Error updating packages"; exit 1; }
+    apt-get -y install haproxy=1.6.* || { echo "Error installing HAproxy"; exit 1; }
+fi
 
-# Configure haproxy configuration file to distribute requests using a roundrobin algorithm
-echo '
+# Set server IPs as variables for easier modification in the future
+WEB_SERVER_1_IP="54.197.105.254"
+WEB_SERVER_2_IP="100.24.206.145"
+
+# Configure haproxy configuration file for round-robin load balancing
+echo "
 frontend sm12se.tech
-        bind 0:80
-        default_backend web_servers
+    bind 0:80
+    default_backend web_servers
 
 backend web_servers
-        balance roundrobin
-        server 91903-web-01 54.197.105.254:80
-        server 91903-web-02 100.24.206.145:80
-' >> /etc/haproxy/haproxy.cfg
+    balance roundrobin
+    server 91903-web-01 $WEB_SERVER_1_IP:80
+    server 91903-web-02 $WEB_SERVER_2_IP:80
+" >> /etc/haproxy/haproxy.cfg || { echo "Error writing to haproxy.cfg"; exit 1; }
 
 # Restart HAproxy service
-service haproxy restart
+service haproxy restart || { echo "Error restarting HAproxy"; exit 1; }
+
+echo "HAproxy configuration completed successfully."

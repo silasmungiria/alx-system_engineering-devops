@@ -1,30 +1,31 @@
 #!/usr/bin/env bash
-# This script configures HAproxy as a load balancer
+# Installs nginx on my server
+apt-get update
+apt-get install -y nginx
 
-# Check if HAproxy is already installed
-if ! dpkg -l | grep -q haproxy; then
-    # Install HAproxy
-    apt-get -y update || { echo "Error updating packages"; exit 1; }
-    apt-get -y install haproxy=1.6.* || { echo "Error installing HAproxy"; exit 1; }
-fi
+mkdir -p /var/www/test/html
+touch /var/www/test/html/index.html
+echo "Hello World!" > /var/www/test/html/index.html
+touch /var/www/test/html/404.html
+echo "Ceci n'est pas une page" > /var/www/test/html/404.html
+printf %s "server {
+     listen      80;
+     listen      [::]:80;
+     add_header  X-Served-By $HOSTNAME;
+     root        /var/www/test/html;
+     index       index.html index.htm;
 
-# Set server IPs as variables for easier modification in the future
-WEB_SERVER_1_IP="54.197.105.254"
-WEB_SERVER_2_IP="100.24.206.145"
 
-# Configure haproxy configuration file for round-robin load balancing
-echo "
-frontend sm12se.tech
-    bind 0:80
-    default_backend web_servers
+     location /redirect_me {
+        return 301 'https://www.youtube.com/watch?v=QH2-TGUlwu4';
+    }
 
-backend web_servers
-    balance roundrobin
-    server 91903-web-01 $WEB_SERVER_1_IP:80
-    server 91903-web-02 $WEB_SERVER_2_IP:80
-" >> /etc/haproxy/haproxy.cfg || { echo "Error writing to haproxy.cfg"; exit 1; }
+    error_page 404 /404.html;
+    location /404 {
+      root /var/www/test/html;
+      internal;
+}
+}
+" > /etc/nginx/sites-available/default
 
-# Restart HAproxy service
-service haproxy restart || { echo "Error restarting HAproxy"; exit 1; }
-
-echo "HAproxy configuration completed successfully."
+service nginx restart

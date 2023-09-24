@@ -1,0 +1,21 @@
+![Request Flow Diagram](https://github.com/Mugambi12/alx-system_engineering-devops/blob/master/0x11-what_happens_when_your_type_google_com_in_your_browser_and_press_enter/Request%20Flow%20Diagram.png)
+
+*Note: The diagram depicts the flow of a request when entering `https://www.google.com` in a browser and pressing Enter.*
+
+1. **DNS Resolution**: The browser sends a DNS request to resolve `www.google.com` to its corresponding IP address.
+
+2. **Request Hits Server IP on Appropriate Port**: The browser sends an HTTP request to the IP address obtained in the previous step, using the standard HTTPS port (443).
+
+3. **Traffic is Encrypted**: The communication between the browser and the server is encrypted using the SSL/TLS protocol, indicated by the HTTPS prefix.
+
+4. **Traffic Goes Through Firewall**: The request passes through a firewall, which acts as a security barrier, allowing legitimate requests and blocking potential threats.
+
+5. **Request is Distributed via Load Balancer**: If applicable, a load balancer distributes the request to one of the available web servers to ensure even load distribution.
+
+6. **Web Server Answers the Request**: The selected web server processes the request and generates an appropriate response.
+
+7. **Application Server Generates the Web Page**: In cases where there's an application server, it handles dynamic content generation, processing business logic, etc.
+
+8. **Application Server Requests Data from the Database**: If needed, the application server interacts with the database to retrieve relevant data.
+
+For this diagram, I used [Draw.io](https://app.diagrams.net/), a versatile and user-friendly diagramming tool. Feel free to use the tool that best suits your preferences.

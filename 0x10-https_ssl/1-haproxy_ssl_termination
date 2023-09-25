@@ -34,13 +34,29 @@ defaults
         errorfile 504 /etc/haproxy/errors/504.http
 
 frontend web-frontend
-	bind *:80
-	bind 0:443 ssl crt /etc/letsencrypt/live/www.sm12se.tech-0001/fullchain.pem
-	mode http
-	default_backend web-backend
+        bind *:80
+        bind *:443 ssl crt /etc/letsencrypt/live/www.sm12se.tech-0001/fullchain.pem
+        mode http
+        default_backend web-backend
 
 backend web-backend
-	mode http
-	balance roundrobin
-	server 91903-web-01 54.197.105.254:80 check
-	server 91903-web-02 100.24.206.145:80 check
+        mode http
+        balance roundrobin
+        redirect scheme https if !{ ssl_fc }
+        server 91903-web-01 54.197.105.254:80 check
+        server 91903-web-02 100.24.206.145:80 check
+
+#frontend web-frontend
+        #bind 0:80
+        #bind 0:443 ssl crt /etc/letsencrypt/live/www.sm12se.tech-0001/fullchain.pem
+        #bind 0:443 ssl crt /etc/letsencrypt/live/www.sm12se.tech-0001/fullchain.pem
+        #http-request redirect scheme https code 301 unless { ssl_fc }
+        #mode http
+        #default_backend web-backend
+
+#backend web-backend
+        #mode http
+        #balance roundrobin
+        #redirect scheme https if !{ ssl_fc }
+        #server 91903-web-01 54.197.105.254:80 check
+        #server 91903-web-02 100.24.206.145:80 check

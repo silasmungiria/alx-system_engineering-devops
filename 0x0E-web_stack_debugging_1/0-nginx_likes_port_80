@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 # script that restores the default server port
 
-sudo ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
-sudo service nginx restart
+# Remove the default nginx configuration file
+rm /etc/nginx/sites-enabled/default
+
+# Configure nginx to listen on port 80 for all active IPv4 IPs
+ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+
+# Restart nginx
+service nginx restart

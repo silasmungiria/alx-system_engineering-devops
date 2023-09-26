@@ -1,5 +1,26 @@
 #!/usr/bin/env bash
 # A Bash scrit to archive all MySQL DATABASE with the help of mysqldump and tar.
 
-mysqldump -uroot -p"$1" --all-databases > backup.sql
-tar -cvzf "$(date +%d-%m-%Y)".tar.gz backup.sql
+# Check if the correct number of arguments is provided
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <mysql_root_password>"
+    exit 1
+fi
+
+# Define variables
+mysql_password="$1"
+timestamp=$(date +%d-%m-%Y)
+dumpfile="backup.sql"
+archive="backup_$timestamp.tar.gz"
+
+# Generate MySQL dump
+mysqldump -uroot -p$mysql_password --all-databases > $dumpfile
+
+# Compress the dump file
+tar -czf $archive $dumpfile
+
+# Clean up temporary dump file
+#rm $dumpfile
+
+# Display success message
+echo "Backup completed successfully!"

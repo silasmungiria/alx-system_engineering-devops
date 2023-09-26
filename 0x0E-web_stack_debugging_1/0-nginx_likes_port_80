@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# script that restores the default server port
+# script that configures server to listen on port 80
 
 # Remove the default nginx configuration file
 rm /etc/nginx/sites-enabled/default

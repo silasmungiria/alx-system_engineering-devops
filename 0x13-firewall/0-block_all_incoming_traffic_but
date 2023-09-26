@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Update package lists
+sudo apt-get update
+
+# Install ufw
+sudo apt-get install ufw -y
+
+# Enable IPv6 support for ufw
+sudo sed -i 's/IPV6=.*/IPV6=yes/' /etc/default/ufw
+
+# Check if ufw is active and disable if necessary
+if sudo ufw status | grep -q "Status: active"; then
+    echo "UFW is active. Disabling..."
+    sudo ufw disable
+fi
+
+# Reset ufw rules to default
+sudo ufw --force reset
+
+# Set default rules
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+# Allow necessary ports
+sudo ufw allow 22/tcp     # Allow SSH
+sudo ufw allow 443/tcp    # Allow HTTPS
+sudo ufw allow 80/tcp     # Allow HTTP
+
+# Enable ufw
+sudo ufw enable
+
+# Reload ufw
+sudo ufw reload
+
+# Display ufw status
+sudo ufw status verbose
+
+# Exit
+exit

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# A Bash scrit to archive all MySQL DATABASE with the help of mysqldump and tar.
+# A Bash script to archive all MySQL databases with the help of mysqldump and tar.
 
 # Check if the correct number of arguments is provided
 if [ "$#" -ne 1 ]; then
@@ -16,11 +16,24 @@ archive="backup_$timestamp.tar.gz"
 # Generate MySQL dump
 mysqldump -uroot -p$mysql_password --all-databases > $dumpfile
 
+# Check if MySQL dump was successful
+if [ $? -ne 0 ]; then
+    echo "Error: MySQL dump failed. Please check your MySQL credentials."
+    exit 1
+fi
+
 # Compress the dump file
 tar -czf $archive $dumpfile
 
-# Clean up temporary dump file
-#rm $dumpfile
+# Check if compression was successful
+file $archive | grep -q "gzip compressed data"
+if [ $? -ne 0 ]; then
+    echo "Error: Compression failed. Please check your tar and gzip installation."
+    exit 1
+fi
+
+# Clean up temporary dump file (uncomment if desired)
+# rm $dumpfile
 
 # Display success message
 echo "Backup completed successfully!"

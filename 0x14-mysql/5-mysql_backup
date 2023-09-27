@@ -1,39 +1,8 @@
-#!/bin/bash
-
-# Check if the user provided a password as an argument
-if [ $# -ne 1 ]; then
-    echo "Error: MySQL root password missing. Usage: $0 <mysql_password>"
-    exit 1
-fi
-
-# Assign provided MySQL root password to a variable
-MYSQL_PASSWORD=$1
-
-# Define the current date components
+#!/usr/bin/env bash
+# backup and compress my databases
+mysqldump --all-databases -u root --password="$1" > backup.sql
 day=$(date +"%d")
 month=$(date +"%m")
 year=$(date +"%Y")
-
-# Construct the filename with the desired format
 file_name="$day-$month-$year.tar.gz"
-
-# Inform the user that the backup process is starting
-echo "Starting MySQL backup process..."
-
-# Create a MySQL dump containing all databases
-mysqldump -uroot -p$MYSQL_PASSWORD --all-databases > backup.sql
-
-# Inform the user that the dump has been completed
-echo "MySQL dump completed successfully."
-
-# Compress the dump into a tar.gz archive
 tar -czvf "$file_name" backup.sql
-
-# Inform the user that the compression process is complete
-echo "Backup file created: $file_name"
-
-# Clean up temporary files
-#rm backup.sql
-
-# Inform the user that the process is finished
-echo "Backup process completed successfully."

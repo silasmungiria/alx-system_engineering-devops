@@ -1,39 +1,39 @@
-#!/usr/bin/env bash
-# A Bash script to archive all MySQL databases with the help of mysqldump and tar.
+#!/bin/bash
 
-# Check if the correct number of arguments is provided
-if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <mysql_root_password>"
+# Check if the user provided a password as an argument
+if [ $# -ne 1 ]; then
+    echo "Error: MySQL root password missing. Usage: $0 <mysql_password>"
     exit 1
 fi
 
-# Define variables
-mysql_password="$1"
-timestamp=$(date +%d-%m-%Y)
-dumpfile="backup.sql"
-archive="backup_$timestamp.tar.gz"
+# Assign provided MySQL root password to a variable
+MYSQL_PASSWORD=$1
 
-# Generate MySQL dump
-mysqldump -uroot -p$mysql_password --all-databases > $dumpfile
+# Define the current date components
+day=$(date +"%d")
+month=$(date +"%m")
+year=$(date +"%Y")
 
-# Check if MySQL dump was successful
-if [ $? -ne 0 ]; then
-    echo "Error: MySQL dump failed. Please check your MySQL credentials."
-    exit 1
-fi
+# Construct the filename with the desired format
+file_name="$day-$month-$year.tar.gz"
 
-# Compress the dump file
-tar -czf $archive $dumpfile
+# Inform the user that the backup process is starting
+echo "Starting MySQL backup process..."
 
-# Check if compression was successful
-file $archive | grep -q "gzip compressed data"
-if [ $? -ne 0 ]; then
-    echo "Error: Compression failed. Please check your tar and gzip installation."
-    exit 1
-fi
+# Create a MySQL dump containing all databases
+mysqldump -uroot -p$MYSQL_PASSWORD --all-databases > backup.sql
 
-# Clean up temporary dump file (uncomment if desired)
-# rm $dumpfile
+# Inform the user that the dump has been completed
+echo "MySQL dump completed successfully."
 
-# Display success message
-echo "Backup completed successfully!"
+# Compress the dump into a tar.gz archive
+tar -czvf "$file_name" backup.sql
+
+# Inform the user that the compression process is complete
+echo "Backup file created: $file_name"
+
+# Clean up temporary files
+#rm backup.sql
+
+# Inform the user that the process is finished
+echo "Backup process completed successfully."

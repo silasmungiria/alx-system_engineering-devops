@@ -1,9 +1,34 @@
 #!/usr/bin/env bash
-# Create MySQL server backup
 
-PASS="$1"
+# Prompt user for MySQL root password
+read -s -p "Enter MySQL root password: " MYSQL_PASSWORD
+echo
+
+# Check if the password argument is provided
+if [ -z "$MYSQL_PASSWORD" ]; then
+  echo "Error: MySQL root password is required."
+  exit 1
+fi
+
+# Define the current date in the desired format: day-month-year
 DATE=$(date +%d-%m-%Y)
 
-mysqldump -uroot -p"$PASS" --opt --all-databases > backup.sql
+# MySQL dump command to create a backup of all databases
+mysqldump -u root -p"$MYSQL_PASSWORD" --all-databases > backup.sql
 
-tar -cvzf "$DATE".tar.gz backup.sql 
+# Check if the MySQL dump was successful
+if [ $? -eq 0 ]; then
+  # Compress the dump into a tar.gz archive with the specified naming format
+  tar -czvf "$DATE.tar.gz" backup.sql
+
+  # Check if the compression was successful
+  if [ $? -eq 0 ]; then
+    echo "MySQL backup completed and compressed as $DATE.tar.gz"
+  else
+    echo "Error: Compression failed"
+    exit 1
+  fi
+else
+  echo "Error: MySQL dump failed. Please check the MySQL password."
+  exit 1
+fi

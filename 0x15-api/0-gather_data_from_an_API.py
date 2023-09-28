@@ -8,7 +8,7 @@ import sys
 if __name__ == "__main__":
     url = "https://jsonplaceholder.typicode.com/"
     emp_id = sys.argv[1]
-    t == task
+    t = task
 
     user_info = requests.get(url + "users/{}".format(emp_id)).json()
     tasks = requests.get(url + "todos", params={"userId": emp_id}).json()

@@ -1,41 +1,56 @@
 #!/usr/bin/python3
-"""Script using this REST API, for a given employee ID,
-returns information about his/her TODO list progress."""
+"""
+This script uses a REST API to retrieve information about a given
+employee's TODO list progress.
+"""
+
+
 import requests as r
 import sys
 
 
 def get_user_info(user_id):
-    """Fetch user information from the API."""
+    """
+    Get user information from the API.
+    """
     url = 'https://jsonplaceholder.typicode.com/'
-    user_info = r.get(url + 'users/{}'.format(user_id)).json()
-    return user_info
+    user_data = r.get(url + 'users/{}'.format(user_id)).json()
+    return user_data
 
 
 def get_todo_list(user_id):
-    """Fetch TODO list for a given user ID."""
+    """
+    Get the TODO list for a user from the API.
+    """
     url = 'https://jsonplaceholder.typicode.com/'
-    todo_list = r.get(url + 'todos', params={'userId': user_id}).json()
-    return todo_list
+    todo_data = r.get(url + 'todos', params={'userId': user_id}).json()
+    return todo_data
 
 
 def get_completed_tasks(todo_list):
-    """Get completed tasks from the TODO list."""
-    return [title.get("title") for title in todo_list if title.get(
-        'completed') is True]
+    """
+    Get completed tasks from the TODO list.
+    """
+    completed_task = [task["title"] for task in todo_list if task["completed"]]
+    return completed_task
 
 
-def print_user_progress(user_name, completed_tasks, total_tasks):
-    """Print the progress of the user."""
-    print(completed_tasks)
-    print("Employee {} is done with tasks({}/{}):".format(user_name, len(
-        completed_tasks), total_tasks))
-    [print("\t {}".format(title)) for title in completed_tasks]
+def print_completed_tasks(user_name, completed, total_tasks):
+    """
+    Print the completed tasks.
+    """
+    print(f"Employee {user_name} is done with tasks"
+          f"({len(completed)}/{total_tasks}):")
+    for task in completed:
+        print(f"\t{task}")
 
 
 if __name__ == '__main__':
     user_id = sys.argv[1]
+
     user_info = get_user_info(user_id)
     todo_list = get_todo_list(user_id)
-    completed_tasks = get_completed_tasks(todo_list)
-    print_user_progress(user_info.get("name"), completed_tasks, len(todo_list))
+    completed_task = get_completed_tasks(todo_list)
+
+    print_completed_tasks(user_info.get("name"), completed_task, len(
+        todo_list))

@@ -1,11 +1,29 @@
 #!/usr/bin/env bash
 # script that configures server to listen on port 80
 
-# Remove the default nginx configuration file
+Remove the default nginx configuration file
 rm /etc/nginx/sites-enabled/default
 
 # Configure nginx to listen on port 80 for all active IPv4 IPs
 ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+
+# Create a new default configuration file with content to return HTTP 200
+echo "server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/html;
+    index index.html;
+
+    server_name _;
+
+    location / {
+        return 200 'Hello, this is a custom HTTP response!';
+    }
+}" > /etc/nginx/sites-available/default
+
+# Create the directory for the root path if it doesn't exist
+mkdir -p /var/www/html
 
 # Restart nginx
 service nginx restart

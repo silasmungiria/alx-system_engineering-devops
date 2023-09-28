@@ -1,19 +1,56 @@
 #!/usr/bin/python3
-"""script using this REST API, for a given employee ID,
-returns information about his/her TODO list progress."""
+"""
+This script uses a REST API to retrieve information about a given
+employee's TODO list progress.
+"""
+
+
 import requests as r
 import sys
 
-BASE_URL = 'https://jsonplaceholder.typicode.com/'
+
+def get_user_info(user_id):
+    """
+    Get user information from the API.
+    """
+    url = 'https://jsonplaceholder.typicode.com/'
+    user_data = r.get(url + 'users/{}'.format(user_id)).json()
+    return user_data
+
+
+def get_todo_list(user_id):
+    """
+    Get the TODO list for a user from the API.
+    """
+    url = 'https://jsonplaceholder.typicode.com/'
+    todo_data = r.get(url + 'todos', params={'userId': user_id}).json()
+    return todo_data
+
+
+def get_completed_tasks(todo_list):
+    """
+    Get completed tasks from the TODO list.
+    """
+    completed_task = [task["title"] for task in todo_list if task["completed"]]
+    return completed_task
+
+
+def print_completed_tasks(user_name, completed, total_tasks):
+    """
+    Print the completed tasks.
+    """
+    print(f"Employee {user_name} is done with tasks"
+          f"({len(completed)}/{total_tasks}):")
+    for task in completed:
+        print(f"\t{task}")
+
 
 if __name__ == '__main__':
-    usr_id = r.get(BASE_URL + 'users/{}'.format(sys.argv[1])).json()
-    to_do = r.get(BASE_URL + 'todos', params={'userId': sys.argv[1]}).json()
-#    print(to_do)
-    completed = [title.get("title") for title in to_do if
-                 title.get('completed') is True]
-    print(completed)
-    print("Employee {} is done with tasks({}/{}):".format(usr_id.get("name"),
-                                                          len(completed),
-                                                          len(to_do)))
-    [print("\t {}".format(title)) for title in completed]
+    user_id = sys.argv[1]
+
+    user_info = get_user_info(user_id)
+    todo_list = get_todo_list(user_id)
+    completed_task = get_completed_tasks(todo_list)
+
+    print_completed_tasks(user_info.get("name"), completed_task, len(
+        todo_list))

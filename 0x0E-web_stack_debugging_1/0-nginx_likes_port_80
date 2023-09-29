@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Script for debugging Nginx on port 80.
+# This script configures Nginx to listen on port 80.
 
-# Create a symbolic link to enable the default site configuration
-sudo ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+# Update Nginx configuration
+sed -i 's/listen 80 default_server;/listen 80;/g' /etc/nginx/sites-available/default
 
-# Restart the Nginx service
-sudo service nginx restart
+# Restart Nginx
+service nginx restart

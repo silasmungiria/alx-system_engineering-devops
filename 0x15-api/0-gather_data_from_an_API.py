@@ -1,10 +1,7 @@
 #!/usr/bin/python3
 """Returns task list information for a given employee ID."""
-
-import json
 import requests
-from sys import argv
-
+import sys
 
 if __name__ == "__main__":
     base_url = "https://jsonplaceholder.typicode.com/"

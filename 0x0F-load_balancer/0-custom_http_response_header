@@ -3,20 +3,18 @@
 apt-get update
 apt-get install -y nginx
 
-# Create directories and files
 mkdir -p /var/www/test/html
 touch /var/www/test/html/index.html
 echo "Hello World!" > /var/www/test/html/index.html
 touch /var/www/test/html/404.html
 echo "Ceci n'est pas une page" > /var/www/test/html/404.html
-
-# Configure Nginx
 printf %s "server {
      listen      80;
      listen      [::]:80;
-     add_header  X-Served-By \$HOSTNAME;
+     add_header  X-Served-By $HOSTNAME;
      root        /var/www/test/html;
      index       index.html index.htm;
+
 
      location /redirect_me {
         return 301 'https://www.youtube.com/watch?v=QH2-TGUlwu4';
@@ -26,9 +24,8 @@ printf %s "server {
     location /404 {
       root /var/www/test/html;
       internal;
-    }
+}
 }
 " > /etc/nginx/sites-available/default
 
-# Restart Nginx service
 service nginx restart

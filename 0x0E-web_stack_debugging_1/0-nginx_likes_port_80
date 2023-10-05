@@ -18,9 +18,13 @@ echo "server {
     listen 80;
     server_name _;
     location / {
-        proxy_pass http://127.0.0.1:8080;
+        root /var/www/html;
+        index index.html;
     }
 }" > /etc/nginx/sites-available/default
+
+# Create a simple index.html file to serve as the web page
+echo "<html><body><h1>Hello, Nginx!</h1></body></html>" > /var/www/html/index.html
 
 # Step 3: Restart Nginx to apply the changes
 service nginx restart

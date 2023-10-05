@@ -15,18 +15,13 @@ if ! service nginx status >/dev/null; then
     service nginx start
 fi
 
-# Step 3: Configure Nginx to listen on port 80
-# Nginx's default configuration should be modified
-# to listen on port 80 by default.
-
-# We'll create a new configuration file for Nginx
-echo "server {
-    listen 80;
-    server_name _;
-    location / {
-        proxy_pass http://127.0.0.1:8080;
-    }
-}" > /etc/nginx/sites-available/default
+# Step 3: Verify Nginx configuration
+nginx_config="/etc/nginx/nginx.conf"
+if ! grep -q "listen 80;" $nginx_config; then
+    # Add the 'listen 80;' line inside the http block
+    sed -i '/http {/ a \    server {\n        listen 80;\n    }' $nginx_config
+    echo "Nginx configuration updated to listen on port 80."
+fi
 
 # Step 4: Restart Nginx to apply the changes
 service nginx restart

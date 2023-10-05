@@ -9,7 +9,13 @@ if ! [ -x /usr/sbin/nginx ]; then
     apt-get -y install nginx
 fi
 
-# Step 2: Configure Nginx to listen on port 80
+# Step 2: Ensure Nginx is running
+# Start Nginx if it's not already running
+if ! service nginx status >/dev/null; then
+    service nginx start
+fi
+
+# Step 3: Configure Nginx to listen on port 80
 # Nginx's default configuration should be modified
 # to listen on port 80 by default.
 
@@ -18,13 +24,16 @@ echo "server {
     listen 80;
     server_name _;
     location / {
-        root /var/www/html;
-        index index.html;
+        proxy_pass http://127.0.0.1:8080;
     }
 }" > /etc/nginx/sites-available/default
 
-# Create a simple index.html file to serve as the web page
-echo "<html><body><h1>Hello, Nginx!</h1></body></html>" > /var/www/html/index.html
-
-# Step 3: Restart Nginx to apply the changes
+# Step 4: Restart Nginx to apply the changes
 service nginx restart
+
+# Step 5: Check if Nginx is successfully serving on port 80
+if [ "$(curl -s -o /dev/null -w '%{http_code}' 0:80)" -eq 200 ]; then
+    echo "Nginx is successfully serving on port 80."
+else
+    echo "Nginx is not serving on port 80 as expected."
+fi

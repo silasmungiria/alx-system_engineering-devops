@@ -1,6 +1,7 @@
-# Puppet manifest to fix a bug in wp-setings.php
+# Puppet manifest to fix a bug in wp-settings.php
 
-exec { 'fix the php extension issue':
-  command => 'sed -i s/phpp/php/g /var/www/html/wp-settings.php',
-  path    => '/usr/local/bin/:/bin/'
+# Define an exec resource to fix the PHP extension issue
+exec { 'fix_php_extension_issue':
+  command => 'sed -i "s/phpp/php/g" /var/www/html/wp-settings.php',
+  path    => '/usr/local/bin:/bin',
 }

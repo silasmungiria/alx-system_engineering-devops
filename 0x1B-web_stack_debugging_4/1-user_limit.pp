@@ -1,23 +1,12 @@
-# 1-user_limit.pp
+# fix limit file at hbton user.
 
-# Define a custom fact to check if the limits are already set.
-Facter.add('holberton_limits_set') do
-  setcode do
-    File.readlines('/etc/security/limits.conf').grep(/holberton/).any?
-  end
-end
-
-# Define a class for managing user limits.
-class user_limits {
-  if $facts['holberton_limits_set'] == false {
-    exec { 'fix_limit_holberton_user':
-      command => 'echo "holberton hard nofile 10000\nholberton soft nofile 20000" >> /etc/security/limits.conf',
-      path    => '/usr/local/bin:/bin',
-    }
-  }
+exec { 'fix_limit_hbton_user':
+  command => 'sed -i "/holberton hard/s/5/10000/" /etc/security/limits.conf',
+  path    => '/usr/local/bin/:/bin/'
 }
 
-# Apply user_limits class only if the limits need to be set.
-if $facts['holberton_limits_set'] == false {
-  include user_limits
+# Increase soft file limit hbton ser.
+exec { 'increase_soft_file':
+  command => 'sed -i "/holberton soft/s/4/20000/" /etc/security/limits.conf',
+  path    => '/usr/local/bin/:/bin/'
 }

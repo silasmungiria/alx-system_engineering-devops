@@ -1,34 +1,6 @@
 #!/usr/bin/env bash
-# This script is intended to fix the issue with Nginx not listening on port 80.
-# It will configure Nginx to listen on port 80 of all active IPv4 IPs.
+# Configures an Nginx server to listen on port 80.
 
-# Step 1: Check if Nginx is installed
-if ! [ -x /usr/sbin/nginx ]; then
-    # If Nginx is not installed, install it
-    apt-get -y update
-    apt-get -y install nginx
-fi
-
-# Step 2: Ensure Nginx is running
-# Start Nginx if it's not already running
-if ! service nginx status >/dev/null; then
-    service nginx start
-fi
-
-# Step 3: Verify Nginx configuration
-nginx_config="/etc/nginx/nginx.conf"
-if ! grep -q "listen 80;" $nginx_config; then
-    # Add the 'listen 80;' line inside the http block
-    sed -i '/http {/ a \    server {\n        listen 80;\n    }' $nginx_config
-    echo "Nginx configuration updated to listen on port 80."
-fi
-
-# Step 4: Restart Nginx to apply the changes
+rm /etc/nginx/sites-enabled/default
+ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 service nginx restart
-
-# Step 5: Check if Nginx is successfully serving on port 80
-if [ "$(curl -s -o /dev/null -w '%{http_code}' 0:80)" -eq 200 ]; then
-    echo "Nginx is successfully serving on port 80."
-else
-    echo "Nginx is not serving on port 80 as expected."
-fi
